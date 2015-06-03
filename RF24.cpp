@@ -339,8 +339,8 @@ void RF24::begin(void)
   // Initialize SPI bus
   SPI.begin();
 
-  ce(LOW);
-  csn(HIGH);
+  ce(LOW); // dezactivat
+  csn(HIGH); // asteapta
 
   // Must allow the radio time to settle else configuration bits will not necessarily stick.
   // This is actually only required following power up but some settling time also appears to
@@ -353,15 +353,19 @@ void RF24::begin(void)
   // Set 1500uS (minimum for 32B payload in ESB@250KBPS) timeouts, to make testing a little easier
   // WARNING: If this is ever lowered, either 250KBS mode with AA is broken or maximum packet
   // sizes must never be used. See documentation for a more complete explanation.
-  write_register(SETUP_RETR,(B0100 << ARD) | (B1111 << ARC));
+  // write_register(0x04,(0100.0000)|0000.1111) == delay(ARD)=1500us + 15 re-transmiteri
+  // ARD=4,ARC=0
+  write_register(SETUP_RETR,(B0100 << ARD) | (B1111 << ARC)); 
 
   // Restore our default PA level
+  // scrie la adresa RF_SETUP(0x06) max power in TX
   setPALevel( RF24_PA_MAX ) ;
 
   // Determine if this is a p or non-p RF24 module and then
   // reset our data rate back to default value. This works
   // because a non-P variant won't allow the data rate to
   // be set to 250Kbps.
+  // scrie la RF_SETUP data rate
   if( setDataRate( RF24_250KBPS ) )
   {
     p_variant = true ;
@@ -372,22 +376,29 @@ void RF24::begin(void)
   setDataRate( RF24_1MBPS ) ;
 
   // Initialize CRC and request 2-byte (16bit) CRC
+  // scrrie in CONFIG(0x00) CRC
   setCRCLength( RF24_CRC_16 ) ;
   
   // Disable dynamic payloads, to match dynamic_payloads_enabled setting
+  // scrie in DYNPD(0x1c) 0
   write_register(DYNPD,0);
 
   // Reset current status
   // Notice reset and flush is the last thing we do
+  // scrie in STATUS(0x07) 
+  // RX_DR=3, TX_DS=5, MAX_RT=4
   write_register(STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
 
   // Set up default configuration.  Callers can always change it later.
   // This channel should be universally safe and not bleed over into adjacent
   // spectrum.
+  // scrie in RF_CH (0x05) frecventa 76=0100.1100
   setChannel(76);
 
   // Flush buffers
+  // trimite FLUSH_RX=0xE2=1110.0010 (comanda)
   flush_rx();
+  // trimite FLUSH_TX=0xE1=1110.0001 (comanda)
   flush_tx();
 }
 
