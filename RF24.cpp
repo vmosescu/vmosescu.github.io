@@ -626,14 +626,17 @@ void RF24::openWritingPipe(uint64_t value)
 
 /****************************************************************************/
 
+// 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F
 static const uint8_t child_pipe[] PROGMEM =
 {
   RX_ADDR_P0, RX_ADDR_P1, RX_ADDR_P2, RX_ADDR_P3, RX_ADDR_P4, RX_ADDR_P5
 };
+// 0x11, 0x12, 0x13, 0x14, 0x15, 0x16
 static const uint8_t child_payload_size[] PROGMEM =
 {
   RX_PW_P0, RX_PW_P1, RX_PW_P2, RX_PW_P3, RX_PW_P4, RX_PW_P5
 };
+// 0, 1, 2, 3, 4, 5
 static const uint8_t child_pipe_enable[] PROGMEM =
 {
   ERX_P0, ERX_P1, ERX_P2, ERX_P3, ERX_P4, ERX_P5
