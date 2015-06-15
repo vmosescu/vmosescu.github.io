@@ -310,8 +310,11 @@ void RF24::printDetails(void)
 {
   print_status(get_status());
 
+  // citeste de la RX_ADDRR_P0(0x0A) 5 bytes: adresa P0 SI apoi inca 5 bytes adresa P1 de la (0x0B)
   print_address_register(PSTR("RX_ADDR_P0-1"),RX_ADDR_P0,2);
+  // citeste de la RX_ADDR_P2(0x0C) 1 byte: adresa P2 SI apoi P3-P5
   print_byte_register(PSTR("RX_ADDR_P2-5"),RX_ADDR_P2,4);
+  // citeste de la TX_ADDR(0x10) 
   print_address_register(PSTR("TX_ADDR"),TX_ADDR);
 
   print_byte_register(PSTR("RX_PW_P0-6"),RX_PW_P0,6);
@@ -644,6 +647,8 @@ static const uint8_t child_pipe_enable[] PROGMEM =
 
 void RF24::openReadingPipe(uint8_t child, uint64_t address)
 {
+  // in setup() se apeleaza cu param (1, pipes[1])
+  // unde const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
   // If this is pipe 0, cache the address.  This is needed because
   // openWritingPipe() will overwrite the pipe 0 address, so
   // startListening() will have to restore it.
